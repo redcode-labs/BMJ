@@ -6,7 +6,7 @@
 </p>
 
 
-![Language](https://img.shields.io/badge/Language-Assembly-purple.svg?longCache=true&style=flat-square) ![Assembler](https://img.shields.io/badge/Assembler-NASM-red.svg?longCache=true&style=flat-square) ![License](https://img.shields.io/badge/License-MIT-blue.svg?longCache=true&style=flat-square) ![Platform](https://img.shields.io/badge/Platform-Linux x86_64-green.svg?longCache=true&style=flat-square)
+![Language](https://img.shields.io/badge/Language-Assembly-purple.svg?longCache=true&style=flat-square) ![Assembler](https://img.shields.io/badge/Assembler-NASM-red.svg?longCache=true&style=flat-square) ![License](https://img.shields.io/badge/License-MIT-blue.svg?longCache=true&style=flat-square) ![Platform](https://img.shields.io/badge/Platform-Linux_x86_64-green.svg?longCache=true&style=flat-square)
 
 ## Introduction
 
