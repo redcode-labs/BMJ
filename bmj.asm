@@ -186,7 +186,7 @@
 
 ; Args -> buffer (string), destination (register)
 ;
-; Same as above, but string is loaded source register using relative offset calculation
+; Same as above, but string is loaded to source register using relative offset calculation
 %macro init_string_rel 2
     %%this_string: db %2, 0x00
     lea %1, [rel %%this_string]
@@ -198,7 +198,7 @@
 ; The string is null-terminated
 ; For example, using:
 ;
-;       init_tring_len my_string, "test"
+;       init_string_len my_string, "test"
 ;
 ; one can later load previously initiated string and it's length using:
 ;
@@ -2175,6 +2175,19 @@ phdrsize    equ $ - phdr
         nop
     %endrep
 %endmacro
+
+; Args -> None
+;
+; Below macros construct short nopsleds of desired length
+; Credits to @travisdowns
+%define nopsled_2 db 0x66, 0x90                                           
+%define nopsled_3 db 0x0F, 0x1F, 0x00                                     
+%define nopsled_4 db 0x0F, 0x1F, 0x40, 0x00                               
+%define nopsled_5 db 0x0F, 0x1F, 0x44, 0x00, 0x00                         
+%define nopsled_6 db 0x66, 0x0F, 0x1F, 0x44, 0x00, 0x00                   
+%define nopsled_7 db 0x0F, 0x1F, 0x80, 0x00, 0x00, 0x00, 0x00             
+%define nopsled_8 db 0x0F, 0x1F, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00       
+%define nopsled_9 db 0x66, 0x0F, 0x1F, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00
 
 ; Args -> length (int), [byte] (hex)
 ;
