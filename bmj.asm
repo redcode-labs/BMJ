@@ -168,9 +168,9 @@
 ; Args -> variable name (string), text (string)
 ;
 ; Initiates two variables: '%1' and '%1_len'
-; Used mainly for non-mutable buffers of fixed size that will be used later in the control flow
+; Used mainly for initializing non-mutable buffers of fixed size that will be used later in the control flow
 %macro init_string_var 2
-    %define sometext '%2' 
+    %define %1 '%2' 
     %strlen %1_len sometext
 %endmacro
 
@@ -503,7 +503,7 @@
 
 ; Args -> filename (string)
 ;
-; My implementation of @ElfMaster's VM detection as seen in Linux.Retaliation
+; My implementation of @elfmaster's VM detection as seen in Linux.Retaliation
 ; Checks for abnormally small interval between current Epoch stamp 
 ; and 'stx_btime' field of a file created when the host was set up  
 ; Such approach might trigger false positives if tested file was modified after the OS deployment
@@ -2170,11 +2170,11 @@ phdrsize    equ $ - phdr
 ; Args -> num_nops (int)
 ;
 ; Simply inserts a wanted number of NOP instructions
-;%macro nops 1
-;    %rep %1
-;        nop
-;    %endrep
-;%macro
+%macro nops 1
+    %rep %1
+        nop
+    %endrep
+%endmacro
 
 ; Args -> length (int), [byte] (hex)
 ;
