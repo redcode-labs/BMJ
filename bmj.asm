@@ -28,7 +28,7 @@
 ;                                                       * MOV instructions: Just a few
 ;                                                       * свободная:        беларусь
 ;
-;               / 0x01 / --- > Stack/register/string allocation helpers (variable initialization, XOR/PUSH chaining)
+;               / 0x01 / --- > Stack/register/string allocation helpers (variables initialization, XOR/PUSH chaining)
 ;               / 0x02 / --- > Auxiliary macros (stack operations, relative addressing, data types operations)           
 ;               / 0x03 / --- > VM/debugging detection (RDTSC, number of CPU cores, file age, clock accelleration mechanism)
 ;               / 0x04 / --- > Time-specific operations (time locks, timers, seeders)
@@ -164,6 +164,33 @@
 	pop rbx
 	pop rax
 %endmacro
+
+; Args -> None
+;
+; This macro works the same as 'save_regs'
+; The only difference is that they are saved in the order conforming with SysV C ABI
+%macro save_regs_sysv 0
+    push rbx
+    push r12
+    push r13
+    push r14
+    push r15
+    push rbp
+%endmacro
+
+; Args -> None
+;
+; This macro works the same as 'restore_regs'
+; The only difference is that they are restored in the order conforming with SysV C ABI
+%macro restore_regs_sysv 0
+    pop rbp
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbx
+%endmacro
+
 
 ; Args -> variable name (string), text (string)
 ;
