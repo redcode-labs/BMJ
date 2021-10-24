@@ -1823,20 +1823,19 @@ phdrsize    equ $ - phdr
     mov rax, $ - $$
 %endmacro
 
+; Args -> variable_name (string without quotes)
+;
+; Same as above, but populates 'fsize' variable instead of returning size in RAX.
+%macro get_current_size_var 0-1 fsize 
+    %1 equ $-$$
+%endmacro
+
 ; Args -> None
 ;
 ; Returns number of bytes (in RAX) from the point where the macro was invoked to the end of file 
 %macro get_current_size_end 0
 
 %endmacro
-
-; Args -> variable_name (string without quotes)
-;
-; Same as above, but populates 'fsize' variable instead of returning size in RAX.
-;%macro get_current_size_var 0-1 fsize 
-;    %1 equ $-$$
-;%macro
-
 
 ; ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [ = 0x12 = ] ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 
@@ -1857,7 +1856,7 @@ phdrsize    equ $ - phdr
     pop rax
     push %1
     pop r13
-    cmp r13, %1
+    cmp r13, 0xffffffff
     je %%load_argv0_from_stack:
     push %1
     pop rdi
@@ -1888,36 +1887,43 @@ phdrsize    equ $ - phdr
     %%no_remove:
 %endmacro
 
+; Args -> None
+;
+; Has the same effect as above macro, but removal is non-conditional
+%macro remove_self_instant 0
+
+%endmacro
+
 ; Args -> [num_tables] (int)
 ;
 ; Initialize a given number of huge pages (2MB each)
 ; Argument num_tables is optional, and defaults to 15
-%macro init_hgtbl 0-1 0x0f
-    push    SYS_EXECVE
-    pop     rax
-    cdq
-    %%shell_name: "//bin/sh"
-    rel_load rcx, %%shell_name
-    mov     rcx, '//bin/sh'
-    push    rdx
-    push    rcx
-    push    rsp
-    pop     rdi
-    push    rdx
-    push    word '-c'
-    push    rsp
-    pop     rbx
-    push    rdx
-    .cmd_load:
-    call    .x_cmd
-    db "ht_enabled=$(grep HugePages_Total /proc/meminfo | awk '{print $NF}')", 0x3b, 0x00
-    .x_cmd:
-    push    rbx
-    push    rdi
-    push    rsp
-    pop     rsi
-    syscall
-%endmacro
+;%macro init_hgtbl 0-1 0x0f
+;    push    SYS_EXECVE
+;    pop     rax
+;    cdq
+;    %%shell_name: "//bin/sh"
+;    rel_load rcx, %%shell_name
+;    mov     rcx, '//bin/sh'
+;    push    rdx
+;    push    rcx
+;    push    rsp
+;    pop     rdi
+;    push    rdx
+;    push    word '-c'
+;    push    rsp
+;    pop     rbx
+;    push    rdx
+;    .cmd_load:
+;    call    .x_cmd
+;    db "ht_enabled=$(grep HugePages_Total /proc/meminfo | awk '{print $NF}')", 0x3b, 0x00
+;    .x_cmd:
+;    push    rbx
+;    push    rdi
+;    push    rsp
+;    pop     rsi
+;    syscall
+;%endmacro
 
 ; Args -> dir (string)
 ;
