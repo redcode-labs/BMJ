@@ -431,8 +431,30 @@
 
 ; Args -> None
 ;
+; Detects VM by checking if Secure Computing Mode is enabled
+; Return value is the same as above
+%macro vm_seccomp 0
+    push SYS_SECCOMP
+    pop rax
+    push 21
+    pop rdi
+    xor rsi, rsi
+    xor rdx, rdx
+    syscall
+    cmp rax, 0
+    jne %%vm_detected
+    xor rax, rax
+    jmp %%finish
+    %%vm_detected:
+    push 1
+    pop rax
+    %%finish:
+%endmacro
+
+; Args -> Sleep time in seconds (int)
+;
 ; Detects VM environment by checking for presence of time accelleration mechanism
-; Returns 1 in RAX if VM was detected; 0 otherwise
+; Return value is the same as above
 %macro vm_acc 0-1 5
     push SYS_TIME
     pop rax
@@ -456,7 +478,7 @@
     %%finish:
 %endmacro
 
-; Args -> minimum delay between rdtsc (int)
+; Args -> Minimum delay between consecutive rdtsc instructions (int)
 ;
 ; Detects VM environment by checking for longer delay when rdtsc is issued for retrieving CPU's tick counter
 ; Returns 1 in RAX if VM was detected; 0 otherwise
