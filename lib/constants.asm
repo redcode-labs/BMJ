@@ -1,4 +1,3 @@
-; -------------- [SYSCALL NUMBERS DECLARATIONS]
 %define SYS_READ 0
 %define SYS_WRITE 1
 %define SYS_OPEN 2
@@ -323,8 +322,6 @@
 %define SYS_USERFAULTFD 323
 %define SYS_MEMBARRIER 324
 %define SYS_MLOCK2 325
-
-; -------------- [CAPABILITIES]
 %define CAP_CHOWN             0
 %define CAP_DAC_OVERRIDE      1
 %define CAP_DAC_READ_SEARCH   2
@@ -365,7 +362,6 @@
 %define CAP_AUDIT_READ		  37
 %define CAP_PERFMON		      38
 %define CAP_BPF			      39
-
 %define PR_SET_PDEATHSIG         1 
 %define PR_GET_PDEATHSIG         2 
 %define PR_GET_DUMPABLE          3
@@ -443,7 +439,6 @@
 %define PR_CAP_AMBIENT_RAISE		 2
 %define PR_CAP_AMBIENT_LOWER		 3
 %define PR_CAP_AMBIENT_CLEAR_ALL	 4
-
 %define SECONDS  1
 %define MINUTES  60
 %define HOURS  3600
@@ -454,7 +449,6 @@
 %define FALSE   0
 %define MAX_PRIO -20
 %define MIN_PRIO 19
-
 %define _ASM_X86_SIGNAL_H
 %define NSIG            32
 %define SIGHUP           1
@@ -505,7 +499,6 @@
 %define SIG_BLOCK          1
 %define SIG_UNBLOCK        2
 %define SIG_SETMASK        3
-
 %define O_ACCMODE	00000003
 %define O_RDONLY	00000000
 %define O_WRONLY	00000001
@@ -540,15 +533,10 @@
 %define F_GETOWN	9	
 %define F_SETSIG	10	
 %define F_GETSIG	11	
-%define F_GETLK64	12	/
 %define F_SETLK64	13
-;%define F_SETLKW64	14%
 %define F_SETOWN_EX	15
-;%define F_GETOWN_EX	16%
-;%define F_GETOWNER_UIDS	17%
 %define F_OFD_GETLK	36
 %define F_OFD_SETLK	37
-;%define F_OFD_SETLKW	38%
 %define F_OWNER_TID	0
 %define F_OWNER_PID	1
 %define F_OWNER_PGRP	2
@@ -566,8 +554,6 @@
 %define LOCK_WRITE	128	
 %define LOCK_RW		192	
 %define F_LINUX_SPECIFIC_BASE	1024
-
-; - - - [ POWER MANAGMENT CONSTANTS ] - - -
 %define _SYS_REBOOT_H	1
 %define RB_AUTOBOOT	0x01234567
 %define RB_HALT_SYSTEM	0xcdef0123
@@ -576,41 +562,17 @@
 %define RB_POWER_OFF	0x4321fedc
 %define RB_SW_SUSPEND	0xd000fce2
 %define RB_KEXEC	0x45584543
-
-; - - - [ DEBUGGING ] - - -
 %define INFO  "[ * ] --- "
 %define ERROR "[ x ] --- "
 %define GOOD  "[ + ] --- "
-
-; - - - [ FILE OPS ] - - -
 %define RW 0x402
 %define EMPTY_STRING ""
-
-; - - - [ LKM LOADING ] - - -
 %define MODULE_INIT_IGNORE_MODVERSIONS	1
 %define MODULE_INIT_IGNORE_VERMAGIC	2
-
-; - - - [ MEMFD CONSTANTS ] - - - 
 %define MFD_CLOEXEC		0x0001U
 %define MFD_ALLOW_SEALING	0x0002U
 %define MFD_HUGETLB		0x0004U
-;#define MFD_HUGE_SHIFT
-;#define MFD_HUGE_MASK
-;#define MFD_HUGE_64KB
-;#define MFD_HUGE_512KB
-;#define MFD_HUGE_1MB	
-;#define MFD_HUGE_2MB	
-;#define MFD_HUGE_8MB	
-;#define MFD_HUGE_16MB
-;#define MFD_HUGE_32MB
-;#define MFD_HUGE_256MB
-;#define MFD_HUGE_512MB
-;#define MFD_HUGE_1GB	
-;#define MFD_HUGE_2GB	
-;#define MFD_HUGE_16GB
-
 %define HUGETLB_FLAG_ENCODE_SHIFT	26
-
 %define HUGETLB_FLAG_ENCODE_16KB	 14 << HUGETLB_FLAG_ENCODE_SHIFT
 %define HUGETLB_FLAG_ENCODE_64KB	 16 << HUGETLB_FLAG_ENCODE_SHIFT
 %define HUGETLB_FLAG_ENCODE_512KB 	 19 << HUGETLB_FLAG_ENCODE_SHIFT
@@ -624,8 +586,6 @@
 %define HUGETLB_FLAG_ENCODE_1GB		 30 << HUGETLB_FLAG_ENCODE_SHIFT
 %define HUGETLB_FLAG_ENCODE_2GB		 31 << HUGETLB_FLAG_ENCODE_SHIFT
 %define HUGETLB_FLAG_ENCODE_16GB	 34 << HUGETLB_FLAG_ENCODE_SHIFT
-
-; - - - [ PRCTL CONSTANTS ] - - -
 %define F_SEAL_SEAL	0x0001	
 %define F_SEAL_SHRINK	0x0002
 %define F_SEAL_GROW	0x0004
@@ -641,15 +601,13 @@
 %define RWH_WRITE_LIFE_MEDIUM	3
 %define RWH_WRITE_LIFE_LONG	4
 %define RWH_WRITE_LIFE_EXTREME	5
-
-%define DN_ACCESS	0x00000001	/* File accessed */
-%define DN_MODIFY	0x00000002	/* File modified */
-%define DN_CREATE	0x00000004	/* File created */
-%define DN_DELETE	0x00000008	/* File removed */
-%define DN_RENAME	0x00000010	/* File renamed */
-%define DN_ATTRIB	0x00000020	/* File changed attibutes */
-%define DN_MULTISHOT	0x80000000	/* Don't remove notifier */
-
+%define DN_ACCESS	0x00000001	
+%define DN_MODIFY	0x00000002	
+%define DN_CREATE	0x00000004	
+%define DN_DELETE	0x00000008	
+%define DN_RENAME	0x00000010	
+%define DN_ATTRIB	0x00000020	
+%define DN_MULTISHOT	0x80000000	
 %define AT_FDCWD		-100    
 %define AT_SYMLINK_NOFOLLOW	0x100 
 %define AT_EACCESS		0x200	
@@ -662,7 +620,6 @@
 %define AT_STATX_FORCE_SYNC	0x2000	
 %define AT_STATX_DONT_SYNC	0x4000	
 %define AT_RECURSIVE		0x8000	
-
 %define SOCK_STREAM	 1
 %define SOCK_DGRAM	 2
 %define SOCK_RAW	3
@@ -671,54 +628,53 @@
 %define SOCK_DCCP	6
 %define SOCK_PACKET	10
 %define AF_UNSPEC	0
-%define AF_UNIX		1	/* Unix domain sockets 		*/
-%define AF_LOCAL	1	/* POSIX name for AF_UNIX	*/
-%define AF_INET		2	/* Internet IP Protocol 	*/
-%define AF_AX25		3	/* Amateur Radio AX.25 		*/
-%define AF_IPX		4	/* Novell IPX 			*/
-%define AF_APPLETALK	5	/* AppleTalk DDP 		*/
-%define AF_NETROM	6	/* Amateur Radio NET/ROM 	*/
-%define AF_BRIDGE	7	/* Multiprotocol bridge 	*/
-%define AF_ATMPVC	8	/* ATM PVCs			*/
-%define AF_X25		9	/* Reserved for X.25 project 	*/
-%define AF_INET6	10	/* IP version 6			*/
-%define AF_ROSE		11	/* Amateur Radio X.25 PLP	*/
-%define AF_DECnet	12	/* Reserved for DECnet project	*/
-%define AF_NETBEUI	13	/* Reserved for 802.2LLC project*/
-%define AF_SECURITY	14	/* Security callback pseudo AF */
-%define AF_KEY		15      /* PF_KEY key management API */
+%define AF_UNIX		1	
+%define AF_LOCAL	1	
+%define AF_INET		2	
+%define AF_AX25		3	
+%define AF_IPX		4	
+%define AF_APPLETALK	5	
+%define AF_NETROM	6	
+%define AF_BRIDGE	7	
+%define AF_ATMPVC	8	
+%define AF_X25		9	
+%define AF_INET6	10	
+%define AF_ROSE		11	
+%define AF_DECnet	12
+%define AF_NETBEUI	13
+%define AF_SECURITY	14
+%define AF_KEY		15    
 %define AF_NETLINK	16
-%define AF_ROUTE	AF_NETLINK /* Alias to emulate 4.4BSD */
-%define AF_PACKET	17	/* Packet family		*/
-%define AF_ASH		18	/* Ash				*/
-%define AF_ECONET	19	/* Acorn Econet			*/
-%define AF_ATMSVC	20	/* ATM SVCs			*/
-%define AF_RDS		21	/* RDS sockets 			*/
-%define AF_SNA		22	/* Linux SNA Project (nutters!) */
-%define AF_IRDA		23	/* IRDA sockets			*/
-%define AF_PPPOX	24	/* PPPoX sockets		*/
-%define AF_WANPIPE	25	/* Wanpipe API Sockets */
-%define AF_LLC		26	/* Linux LLC			*/
-%define AF_IB		27	/* Native InfiniBand address	*/
-%define AF_MPLS		28	/* MPLS */
-%define AF_CAN		29	/* Controller Area Network      */
-%define AF_TIPC		30	/* TIPC sockets			*/
-%define AF_BLUETOOTH	31	/* Bluetooth sockets 		*/
-%define AF_IUCV		32	/* IUCV sockets			*/
-%define AF_RXRPC	33	/* RxRPC sockets 		*/
-%define AF_ISDN		34	/* mISDN sockets 		*/
-%define AF_PHONET	35	/* Phonet sockets		*/
-%define AF_IEEE802154	36	/* IEEE802154 sockets		*/
-%define AF_CAIF		37	/* CAIF sockets			*/
-%define AF_ALG		38	/* Algorithm sockets		*/
-%define AF_NFC		39	/* NFC sockets			*/
-%define AF_VSOCK	40	/* vSockets			*/
-%define AF_KCM		41	/* Kernel Connection Multiplexor*/
-%define AF_QIPCRTR	42	/* Qualcomm IPC Router          */
+%define AF_ROUTE	AF_NETLINK 
+%define AF_PACKET	17	
+%define AF_ASH		18	
+%define AF_ECONET	19
+%define AF_ATMSVC	20	
+%define AF_RDS		21	
+%define AF_SNA		22	
+%define AF_IRDA		23
+%define AF_PPPOX	24
+%define AF_WANPIPE	25
+%define AF_LLC		26	
+%define AF_IB		27	
+%define AF_MPLS		28
+%define AF_CAN		29	
+%define AF_TIPC		30
+%define AF_BLUETOOTH	31	
+%define AF_IUCV		32	
+%define AF_RXRPC	33	
+%define AF_ISDN		34	
+%define AF_PHONET	35	
+%define AF_IEEE802154	36	
+%define AF_CAIF		37	
+%define AF_ALG		38	
+%define AF_NFC		39	
+%define AF_VSOCK	40
+%define AF_KCM		41
+%define AF_QIPCRTR	42
 %define AF_SMC		43	
-%define AF_XDP		44	/* XDP sockets			*/
-%define AF_MAX		45	/* For now.. */
-
+%define AF_XDP		44
+%define AF_MAX		45
 %define PF_UNSPEC	AF_UNSPEC
 %define PF_UNIX		AF_UNIX
 %define PF_LOCAL	AF_LOCAL
@@ -767,45 +723,42 @@
 %define PF_SMC		AF_SMC
 %define PF_XDP		AF_XDP
 %define PF_MAX		AF_MAX
-
 %define SOMAXCONN	4096%
 %define MSG_OOB		1
 %define MSG_PEEK	2
 %define MSG_DONTROUTE	4
-%define MSG_TRYHARD     4       /* Synonym for MSG_DONTROUTE for DECnet */
+%define MSG_TRYHARD     4       
 %define MSG_CTRUNC	8
-%define MSG_PROBE	0x10	/* Do not send. Only probe path f.e. for MTU */
+%define MSG_PROBE	0x10	
 %define MSG_TRUNC	0x20
-%define MSG_DONTWAIT	0x40	/* Nonblocking io		 */
-%define MSG_EOR         0x80	/* End of record */
-%define MSG_WAITALL	0x100	/* Wait for a full request */
+%define MSG_DONTWAIT	0x40	
+%define MSG_EOR         0x80
+%define MSG_WAITALL	0x100
 %define MSG_FIN         0x200
 %define MSG_SYN		0x400
-%define MSG_CONFIRM	0x800	/* Confirm path validity */
+%define MSG_CONFIRM	0x800
 %define MSG_RST		0x1000
-%define MSG_ERRQUEUE	0x2000	/* Fetch message from error queue */
-%define MSG_NOSIGNAL	0x4000	/* Do not generate SIGPIPE */
-%define MSG_MORE	0x8000	/* Sender will send more */
-%define MSG_WAITFORONE	0x10000	/* recvmmsg(): block until 1+ packets avail */
-%define MSG_SENDPAGE_NOPOLICY 0x10000 /* sendpage() internal : do no apply policy */
-%define MSG_SENDPAGE_NOTLAST 0x20000 /* sendpage() internal : not the last page */
-%define MSG_BATCH	0x40000 /* sendmmsg(): more messages coming */
+%define MSG_ERRQUEUE	0x2000	
+%define MSG_NOSIGNAL	0x4000	
+%define MSG_MORE	0x8000	
+%define MSG_WAITFORONE	0x10000	
+%define MSG_SENDPAGE_NOPOLICY 0x10000 
+%define MSG_SENDPAGE_NOTLAST 0x20000 
+%define MSG_BATCH	0x40000 
 %define MSG_EOF         MSG_FIN
-%define MSG_NO_SHARED_FRAGS 0x80000 /* sendpage() internal : page frags are not shared */
+%define MSG_NO_SHARED_FRAGS 0x80000 
 %define MSG_SENDPAGE_DECRYPTED	0x100000 
 %define MSG_ZEROCOPY	0x4000000	
 %define MSG_FASTOPEN	0x20000000	
 %define MSG_CMSG_CLOEXEC 0x40000000	
 %define MSG_CMSG_COMPAT	0		
-
-
 %define SOL_IP		0
 %define SOL_TCP		6
 %define SOL_UDP		17
 %define SOL_IPV6	41
 %define SOL_ICMPV6	58
 %define SOL_SCTP	132
-%define SOL_UDPLITE	136     /* UDP-Lite (RFC 3828) */
+%define SOL_UDPLITE	136     
 %define SOL_RAW		255
 %define SOL_IPX		256
 %define SOL_AX25	257
@@ -815,8 +768,8 @@
 %define SOL_DECNET	261
 %define	SOL_X25		262
 %define SOL_PACKET	263
-%define SOL_ATM		264	/* ATM layer (cell level) */
-%define SOL_AAL		265	/* ATM Adaption Layer (packet level) */
+%define SOL_ATM		264	
+%define SOL_AAL		265	
 %define SOL_IRDA        266
 %define SOL_NETBEUI	267
 %define SOL_LLC		268
@@ -836,33 +789,76 @@
 %define SOL_TLS		282
 %define SOL_XDP		283
 %define IPX_TYPE	1
-
-; - - - [ NETWORKING ALIASES ] - - -
 %define LOCALHOST 0x0100007f
 %define LOOPBACK  0x00000000
 %define BROADCAST 0xffffffff
-
-; - - -  [TIMESTAMP CONSTANTS ] - - -
 %define PRESENT 0x00000000
 %define FUTURE  0xffffffff
-
-; - - - [ LSEEK ] - - -
 %define SEEK_SET	0	
 %define SEEK_CUR	1	
 %define SEEK_END	2	
 %define SEEK_DATA	3
 %define SEEK_HOLE	4
 %define SEEK_MAX	SEEK_HOLE
-
 %define	RUSAGE_SELF	0
 %define	RUSAGE_CHILDREN	-1
 %define RUSAGE_BOTH	-2		
 %define	RUSAGE_THREAD	1		
-
-%define	PRIO_MIN	(-20)
+%define	PRIO_MIN	-20
 %define	PRIO_MAX	20
 %define ADDR_NO_RANDOMIZE 0x0040000
 %define	PRIO_PROCESS	0
 %define	PRIO_PGRP	1
 %define	PRIO_USER	2
 %define _STK_LIM	(8*1024*1024)
+%define EHDR_SIZE       64
+%define ELF64      2
+%define O_RDONLY        0
+%define O_RDWR          2
+%define SEEK_END        2
+%define DIRENT_BUFSIZE  1024
+%define MFD_CLOEXEC     1
+%define DT_REG          8
+%define PT_LOAD         1
+%define PT_NOTE         4
+%define PF_X            1
+%define PF_R            4
+%define PAGE_SIZE 4096
+%define EM_X86_64       0x3e
+%define MAP_PRIVATE     0x2
+%define PROT_READ       0x1
+%define PROT_WRITE      0x2
+%define DT_REG          0x8
+%define PT_LOAD         0x1
+%define STDOUT 1
+%define SHT_NULL	0
+%define SHT_PROGBITS	1
+%define SHT_SYMTAB	2
+%define SHT_STRTAB	3
+%define SHT_RELA	4
+%define SHT_HASH	5
+%define SHT_DYNAMIC	6
+%define SHT_NOTE	7
+%define SHT_NOBITS	8
+%define SHT_REL		9
+%define SHT_SHLIB	10
+%define SHT_DYNSYM	11
+%define SHT_NUM		12
+%define SHT_LOPROC	0x70000000
+%define SHT_HIPROC	0x7fffffff
+%define SHT_LOUSER	0x80000000
+%define SHT_HIUSER	0xffffffff
+%define SHF_WRITE		0x1
+%define SHF_ALLOC		0x2
+%define SHF_EXECINSTR		0x4
+%define SHF_RELA_LIVEPATCH	0x00100000
+%define SHF_RO_AFTER_INIT	0x00200000
+%define SHF_MASKPROC		0xf0000000
+%define SHN_UNDEF	0
+%define SHN_LORESERVE	0xff00
+%define SHN_LOPROC	0xff00
+%define SHN_HIPROC	0xff1f
+%define SHN_LIVEPATCH	0xff20
+%define SHN_ABS		0xfff1
+%define SHN_COMMON	0xfff2
+%define SHN_HIRESERVE	0xffff
