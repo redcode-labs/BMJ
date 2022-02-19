@@ -530,25 +530,25 @@
 ; Detects VM environment by checking for low number of CPU cores
 ; Default trigger for positive detection is 2 cores (or less)
 ; Returns 1 in RAX if VM was detected; 0 otherwise
-%macro vm_cpu 0-1 2
-    run ""
-    file_open ".numcpu"
-    push rax
-    pop rdi
-    xor rax, rax
-    push r9             
-    mov rsi, rsp        
-    add rdx, 1          
-    syscall
-    ascii2dec rsi
-    xor rax, rax
-    cmp rsi, %1
-    jle %%vm_detected
-    jmp %%finish
-    %%vm_detected:
-    inc rax
-    %%finish:
-%endmacro
+;%macro vm_cpu 0-1 2
+;    run ""
+;    file_open ".numcpu"
+;    push rax
+;    pop rdi
+;    xor rax, rax
+;    push r9             
+;    mov rsi, rsp        
+;    add rdx, 1          
+;    syscall
+;    ascii2dec rsi
+;    xor rax, rax
+;    cmp rsi, %1
+;    jle %%vm_detected
+;    jmp %%finish
+;    %%vm_detected:
+;    inc rax
+;    %%finish:
+;%endmacro
 
 ; Args -> filename (string)
 ;
@@ -557,6 +557,7 @@
 ; and 'stx_btime' field of a file created when the host was set up  
 ; Such approach might trigger false positives if tested file was modified after the OS deployment
 %macro vm_age 0-1 "/etc/hostname"
+    save_regs r9, r10
     push SYS_STATX
     pop rax
     xor rdi, rdi
@@ -564,6 +565,10 @@
     reserve_stack_bytes_rel STATX_size, r8 
     syscall
     mov r9, [r8+STATX.stx_btime_seconds] 
+    time_get
+    sub rcx, r8
+    interval_to_seconds r10,%2,%3
+    restore_regs r9, r10
 %endmacro
 
 ; Args -> None
