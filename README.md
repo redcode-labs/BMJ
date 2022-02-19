@@ -1,14 +1,14 @@
 <h1 align="center"> Bare Metal Jacket </h1> <br>
 <p align="center">
   <a>
-    <img alt="Bashark" title="Bashark" src="BMJ.png" width="450">
+    <img src="BMJ.png" width="450">
   </a>
 </p>
 
 
 ## Introduction
 
-BMJ contains low-level code fragments (in a form of NASM macros) that can assist in writing small, position-independent and null-free payloads. Most of the macros communicate directly with the kernel - no external dependencies (such as glibc) are needed, so the code is portable across all 64-bit GNU/Linux systems.
+BMJ contains low-level code fragments (in a form of NASM macros) that can assist in writing small, position-independent and null-free shellcode. Most of the macros communicate directly with the kernel - no external dependencies (such as glibc) are needed, so the code is portable across all 64-bit GNU/Linux systems.
 
 ## Features
 The framework's source is divided into 16 separate sections - each of them provides different set of macros for specific tasks.
