@@ -596,12 +596,12 @@
 
 ; Args -> syscall_number (int)
 ;
-; Initiate the RAX register with system call number specified in %1 using variable instructions
-;%macro scall 1 
-;    mov rbx, 100
-;    mov rcx, %1
-;    cmp rcx, rbx
-;%endmacro
+; Initiate the RAX register with system call number specified in %1 using non-standard instruction set
+%macro scall 1 
+    xor rax, rax
+    sub rax, %1
+    neg rax
+%endmacro
 
 ; Args -> [destination] (register)
 ;
