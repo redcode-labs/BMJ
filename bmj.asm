@@ -603,6 +603,36 @@
 ;    cmp rcx, rbx
 ;%endmacro
 
+; Args -> [destination] (register)
+;
+; Returns a number of seconds passed since Epoch in destination register
+%macro time_get 0-1 rcx
+    push SYS_TIME
+    pop rax
+    xor rdi, rdi
+    syscall
+    push rax
+    pop %1
+%endmacro
+
+; Args -> seconds (register), multiplier (int), interval (unit)
+;
+; Returns:
+;       0 if number of seconds equals the specified time unit
+;      -1 if seconds < (multiplier*interval) 
+;       1 if seconds > (multiplier*interval)
+%macro time_compare 
+    save_regs r8
+    %%init_seconds_in_r8:
+    interval_to_seconds r8,%2,%3
+    cmp %1, r8
+    je %%set_0
+    jl %%set_neg
+    jg %%set_1
+    %%restorer
+    restore_regs r8
+%endmacro
+
 ; Args -> interval (int), unit, /// [reboot] (bool) ///
 ;
 ; Sets time-to-live of the program
