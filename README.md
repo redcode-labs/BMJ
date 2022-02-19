@@ -6,8 +6,6 @@
 </p>
 
 
-![Language](https://img.shields.io/badge/Language-Assembly-purple.svg?longCache=true&style=flat-square) ![Assembler](https://img.shields.io/badge/Assembler-NASM-red.svg?longCache=true&style=flat-square) ![License](https://img.shields.io/badge/License-MIT-blue.svg?longCache=true&style=flat-square) ![Platform](https://img.shields.io/badge/Platform-Linux_x86_64-green.svg?longCache=true&style=flat-square)
-
 ## Introduction
 
 BMJ contains low-level code fragments (in a form of NASM macros) that can assist in writing small, position-independent and null-free payloads. Most of the macros communicate directly with the kernel - no external dependencies (such as glibc) are needed, so the code is portable across all 64-bit GNU/Linux systems.
