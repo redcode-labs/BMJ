@@ -30,6 +30,14 @@ The framework's source is divided into 16 separate sections - each of them provi
 * [ 0x15 ] --- > Disablers (security measures, ASLR, process inspection)
 * [ < * > ] --- > Experimental code (network/signal-based c2 channels, process protection, signal throwback) 
 
+## Examples
+  `cmd_exec.asm` - Checks for elevated privilleges. If present, a command is executed in background and the machine is rebooted afterwards.
+  
+  `timed_stager.asm` - A program with operational time of 5 minutes attempts to download a remote file and execute it in memory. A TCP reconnection in case of failure is performed in background every 20 seconds, infinitely.
+
+  `reverse_shell.asm` - A reverse shell that removes itself via `argv[0]` unlink, changes it's process priority, elevates privilleges and detaches from current terminal session.
+
+  `vm_and_stuff.asm` - A program prepended with 40 nop (`0x90`) instructions, padded with nops until it reaches 256 bytes in size. Only one instance can run simultaneously on host, thanks to `flock(2)`. After checking for VM presence and an attempt to disable ASLR, a TCP-connect pingback payload is launched.
 ## License
 This software is under [MIT License](https://en.wikipedia.org/wiki/MIT_License)
 
